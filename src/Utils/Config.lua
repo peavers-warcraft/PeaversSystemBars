@@ -29,6 +29,9 @@ PSB.Config = {
     updateInterval = 0.5,
     showOnLogin = true,
     showTitleBar = true,
+    showFrameBackground = true,
+    showStatNames = true,
+    showStatValues = true,
     DEBUG_ENABLED = false,
     customColors = {},
 
@@ -116,6 +119,10 @@ function Config:Save()
     profile.barSpacing = self.barSpacing
     profile.showTitleBar = self.showTitleBar
     profile.lockPosition = self.lockPosition
+    profile.showFrameBackground = self.showFrameBackground
+    profile.showStatNames = self.showStatNames
+    profile.showStatValues = self.showStatValues
+    profile.updateInterval = self.updateInterval
     profile.DEBUG_ENABLED = self.DEBUG_ENABLED
     profile.customColors = self.customColors
 end
@@ -199,6 +206,18 @@ function Config:Load()
     end
     if profile.lockPosition ~= nil then
         self.lockPosition = profile.lockPosition
+    end
+    if profile.showFrameBackground ~= nil then
+        self.showFrameBackground = profile.showFrameBackground
+    end
+    if profile.showStatNames ~= nil then
+        self.showStatNames = profile.showStatNames
+    end
+    if profile.showStatValues ~= nil then
+        self.showStatValues = profile.showStatValues
+    end
+    if profile.updateInterval then
+        self.updateInterval = profile.updateInterval
     end
     if profile.DEBUG_ENABLED ~= nil then
         self.DEBUG_ENABLED = profile.DEBUG_ENABLED

@@ -248,6 +248,78 @@ function ConfigUI:CreateDisplayOptions(content, yPos, baseSpacing, sectionSpacin
     self.uiElements.lockPositionCheckbox = lockPositionCheckbox
     yPos = newY - 8
 
+    -- Show frame background checkbox
+    local frameBackgroundCheckbox, newY = Utils:CreateCheckbox(
+        content, "PSBFrameBackgroundCheckbox",
+        L("CONFIG_SHOW_FRAME_BACKGROUND"), controlIndent, yPos,
+        Config.showFrameBackground ~= false,
+        function(checked)
+            Config.showFrameBackground = checked
+            Config:Save()
+            if PSB.Core then
+                PSB.Core:UpdateFrameBackground()
+            end
+        end
+    )
+    self.uiElements.frameBackgroundCheckbox = frameBackgroundCheckbox
+    yPos = newY - 8
+
+    -- Add separator
+    local _, newY = UI:CreateSeparator(content, baseSpacing + 15, yPos, 400)
+    yPos = newY - 15
+
+    -- Update settings subsection
+    local updateLabel, newY = Utils:CreateSubsectionLabel(content, L("CONFIG_UPDATE_SETTINGS"), controlIndent, yPos)
+    yPos = newY - 8
+
+    -- Update interval dropdown - use ordered table for consistent display
+    local updateIntervalContainer = CreateFrame("Frame", nil, content)
+    updateIntervalContainer:SetSize(sliderWidth, 60)
+    updateIntervalContainer:SetPoint("TOPLEFT", controlIndent, yPos)
+
+    local intervalLabel = updateIntervalContainer:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    intervalLabel:SetPoint("TOPLEFT", 0, 0)
+    intervalLabel:SetText(L("CONFIG_UPDATE_INTERVAL"))
+
+    local intervalDropdown = CreateFrame("Frame", "PSBUpdateIntervalDropdown", updateIntervalContainer, "UIDropDownMenuTemplate")
+    intervalDropdown:SetPoint("TOPLEFT", 0, -20)
+    UIDropDownMenu_SetWidth(intervalDropdown, sliderWidth - 55)
+
+    -- Ordered interval options
+    local intervalOrder = { 0.5, 1, 2, 5, 10 }
+    local intervalLabels = {
+        [0.5] = "0.5s",
+        [1] = "1s",
+        [2] = "2s",
+        [5] = "5s",
+        [10] = "10s",
+    }
+
+    -- Set initial text
+    local currentInterval = Config.updateInterval or 0.5
+    UIDropDownMenu_SetText(intervalDropdown, intervalLabels[currentInterval] or "0.5s")
+
+    UIDropDownMenu_Initialize(intervalDropdown, function(self, level)
+        for _, intervalValue in ipairs(intervalOrder) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = intervalLabels[intervalValue]
+            info.value = intervalValue
+            info.checked = (intervalValue == Config.updateInterval)
+            info.func = function()
+                Config.updateInterval = intervalValue
+                Config:Save()
+                UIDropDownMenu_SetText(intervalDropdown, intervalLabels[intervalValue])
+                if PSB.UpdateHandler and PSB.UpdateHandler.Restart then
+                    PSB.UpdateHandler:Restart()
+                end
+            end
+            UIDropDownMenu_AddButton(info)
+        end
+    end)
+
+    self.uiElements.intervalDropdown = intervalDropdown
+    yPos = yPos - 65
+
     return yPos
 end
 
@@ -490,6 +562,48 @@ function ConfigUI:CreateTextOptions(content, yPos, baseSpacing, sectionSpacing)
     self.uiElements.fontShadowCheckbox = fontShadowCheckbox
     yPos = newY - 15
 
+    -- Add separator
+    local _, newY = UI:CreateSeparator(content, baseSpacing + 15, yPos, 400)
+    yPos = newY - 15
+
+    -- Text display subsection
+    local textDisplayLabel, newY = Utils:CreateSubsectionLabel(content, L("CONFIG_TEXT_DISPLAY"), controlIndent, yPos)
+    yPos = newY - 8
+
+    -- Show stat names checkbox
+    local showStatNamesCheckbox, newY = Utils:CreateCheckbox(
+        content, "PSBShowStatNamesCheckbox",
+        L("CONFIG_SHOW_STAT_NAMES"), controlIndent, yPos,
+        Config.showStatNames ~= false,
+        function(checked)
+            Config.showStatNames = checked
+            Config:Save()
+            if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
+                PSB.BarManager:CreateBars(PSB.Core.contentFrame)
+                PSB.Core:AdjustFrameHeight()
+            end
+        end
+    )
+    self.uiElements.showStatNamesCheckbox = showStatNamesCheckbox
+    yPos = newY - 8
+
+    -- Show stat values checkbox
+    local showStatValuesCheckbox, newY = Utils:CreateCheckbox(
+        content, "PSBShowStatValuesCheckbox",
+        L("CONFIG_SHOW_STAT_VALUES"), controlIndent, yPos,
+        Config.showStatValues ~= false,
+        function(checked)
+            Config.showStatValues = checked
+            Config:Save()
+            if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
+                PSB.BarManager:CreateBars(PSB.Core.contentFrame)
+                PSB.Core:AdjustFrameHeight()
+            end
+        end
+    )
+    self.uiElements.showStatValuesCheckbox = showStatValuesCheckbox
+    yPos = newY - 15
+
     return yPos
 end
 
@@ -524,11 +638,20 @@ function ConfigUI:RefreshUI()
     if self.uiElements.lockPositionCheckbox then
         self.uiElements.lockPositionCheckbox:SetChecked(Config.lockPosition or false)
     end
+    if self.uiElements.frameBackgroundCheckbox then
+        self.uiElements.frameBackgroundCheckbox:SetChecked(Config.showFrameBackground ~= false)
+    end
     if self.uiElements.fontOutlineCheckbox then
         self.uiElements.fontOutlineCheckbox:SetChecked(Config.fontOutline == "OUTLINE")
     end
     if self.uiElements.fontShadowCheckbox then
         self.uiElements.fontShadowCheckbox:SetChecked(Config.fontShadow or false)
+    end
+    if self.uiElements.showStatNamesCheckbox then
+        self.uiElements.showStatNamesCheckbox:SetChecked(Config.showStatNames ~= false)
+    end
+    if self.uiElements.showStatValuesCheckbox then
+        self.uiElements.showStatValuesCheckbox:SetChecked(Config.showStatValues ~= false)
     end
 end
 

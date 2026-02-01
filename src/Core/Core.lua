@@ -11,13 +11,20 @@ function Core:Initialize()
     -- Create main frame
     self.frame = CreateFrame("Frame", "PeaversSystemBarsFrame", UIParent, "BackdropTemplate")
     self.frame:SetSize(config.frameWidth, 100) -- Height will be adjusted
-    self.frame:SetBackdrop({
-        bgFile = "Interface\\BUTTONS\\WHITE8X8",
-        edgeFile = "Interface\\BUTTONS\\WHITE8X8",
-        tile = true, tileSize = 16, edgeSize = 1,
-    })
-    self.frame:SetBackdropColor(config.bgColor.r, config.bgColor.g, config.bgColor.b, config.bgAlpha)
-    self.frame:SetBackdropBorderColor(0, 0, 0, config.bgAlpha)
+
+    -- Apply background based on showFrameBackground setting
+    if config.showFrameBackground then
+        self.frame:SetBackdrop({
+            bgFile = "Interface\\BUTTONS\\WHITE8X8",
+            edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+            tile = true, tileSize = 16, edgeSize = 1,
+        })
+        self.frame:SetBackdropColor(config.bgColor.r, config.bgColor.g, config.bgColor.b, config.bgAlpha)
+        self.frame:SetBackdropBorderColor(0, 0, 0, config.bgAlpha)
+    else
+        -- No backdrop when background is disabled
+        self.frame:SetBackdrop(nil)
+    end
 
     -- Create title bar using PeaversCommons if available
     if PeaversCommons and PeaversCommons.TitleBar then
@@ -155,6 +162,32 @@ function Core:UpdateTitleBarVisibility()
 
         self:AdjustFrameHeight()
         self:UpdateFrameLock()
+    end
+end
+
+function Core:UpdateFrameBackground()
+    local config = PSB.Config
+
+    if self.frame then
+        if config.showFrameBackground then
+            -- Show background with border
+            self.frame:SetBackdrop({
+                bgFile = "Interface\\BUTTONS\\WHITE8X8",
+                edgeFile = "Interface\\BUTTONS\\WHITE8X8",
+                tile = true, tileSize = 16, edgeSize = 1,
+            })
+            self.frame:SetBackdropColor(config.bgColor.r, config.bgColor.g, config.bgColor.b, config.bgAlpha)
+            self.frame:SetBackdropBorderColor(0, 0, 0, config.bgAlpha)
+        else
+            -- Remove backdrop entirely (no background, no border)
+            self.frame:SetBackdrop(nil)
+        end
+
+        -- Recreate bars to update positioning
+        if PSB.BarManager and self.contentFrame then
+            PSB.BarManager:CreateBars(self.contentFrame)
+            self:AdjustFrameHeight()
+        end
     end
 end
 

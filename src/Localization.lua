@@ -65,6 +65,18 @@ Locales["enUS"] = {
     ["CONFIG_FONT_STYLE"] = "Font Style:",
     ["CONFIG_FONT_OUTLINE"] = "Outlined Font",
     ["CONFIG_FONT_SHADOW"] = "Font Shadow",
+
+    -- Config UI - Frame Background
+    ["CONFIG_SHOW_FRAME_BACKGROUND"] = "Show Frame Background",
+
+    -- Config UI - Update Settings
+    ["CONFIG_UPDATE_SETTINGS"] = "Update Settings:",
+    ["CONFIG_UPDATE_INTERVAL"] = "Update Interval",
+
+    -- Config UI - Text Display
+    ["CONFIG_TEXT_DISPLAY"] = "Text Display:",
+    ["CONFIG_SHOW_STAT_NAMES"] = "Show Stat Names",
+    ["CONFIG_SHOW_STAT_VALUES"] = "Show Stat Values",
 }
 
 -- Simplified Chinese
@@ -104,6 +116,12 @@ Locales["zhCN"] = {
     ["CONFIG_FONT_STYLE"] = "字体样式：",
     ["CONFIG_FONT_OUTLINE"] = "字体描边",
     ["CONFIG_FONT_SHADOW"] = "字体阴影",
+    ["CONFIG_SHOW_FRAME_BACKGROUND"] = "显示框架背景",
+    ["CONFIG_UPDATE_SETTINGS"] = "更新设置：",
+    ["CONFIG_UPDATE_INTERVAL"] = "更新间隔",
+    ["CONFIG_TEXT_DISPLAY"] = "文字显示：",
+    ["CONFIG_SHOW_STAT_NAMES"] = "显示属性名称",
+    ["CONFIG_SHOW_STAT_VALUES"] = "显示属性值",
 }
 
 -- Traditional Chinese
@@ -143,6 +161,12 @@ Locales["zhTW"] = {
     ["CONFIG_FONT_STYLE"] = "字型樣式：",
     ["CONFIG_FONT_OUTLINE"] = "字型描邊",
     ["CONFIG_FONT_SHADOW"] = "字型陰影",
+    ["CONFIG_SHOW_FRAME_BACKGROUND"] = "顯示框架背景",
+    ["CONFIG_UPDATE_SETTINGS"] = "更新設定：",
+    ["CONFIG_UPDATE_INTERVAL"] = "更新間隔",
+    ["CONFIG_TEXT_DISPLAY"] = "文字顯示：",
+    ["CONFIG_SHOW_STAT_NAMES"] = "顯示屬性名稱",
+    ["CONFIG_SHOW_STAT_VALUES"] = "顯示屬性值",
 }
 
 -- Korean
@@ -182,6 +206,12 @@ Locales["koKR"] = {
     ["CONFIG_FONT_STYLE"] = "글꼴 스타일:",
     ["CONFIG_FONT_OUTLINE"] = "글꼴 외곽선",
     ["CONFIG_FONT_SHADOW"] = "글꼴 그림자",
+    ["CONFIG_SHOW_FRAME_BACKGROUND"] = "프레임 배경 표시",
+    ["CONFIG_UPDATE_SETTINGS"] = "업데이트 설정:",
+    ["CONFIG_UPDATE_INTERVAL"] = "업데이트 간격",
+    ["CONFIG_TEXT_DISPLAY"] = "텍스트 표시:",
+    ["CONFIG_SHOW_STAT_NAMES"] = "능력치 이름 표시",
+    ["CONFIG_SHOW_STAT_VALUES"] = "능력치 값 표시",
 }
 
 -- Set the active locale table
