@@ -1,5 +1,8 @@
 local addonName, PSB = ...
 
+local PeaversCommons = _G.PeaversCommons
+local Utils = PeaversCommons.Utils
+
 -- Initialize BarManager namespace
 PSB.BarManager = {}
 local BarManager = PSB.BarManager
@@ -60,7 +63,7 @@ function BarManager:CreateBars(contentFrame)
         local labelText = nil
         if config.showStatNames then
             labelText = statusBar:CreateFontString(nil, "OVERLAY")
-            labelText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
+            Utils.SafeSetFont(labelText, config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
             labelText:SetPoint("LEFT", statusBar, "LEFT", 4, 0)
             labelText:SetText(name)
             labelText:SetTextColor(1, 1, 1)
@@ -73,7 +76,7 @@ function BarManager:CreateBars(contentFrame)
         local valueText = nil
         if config.showStatValues then
             valueText = statusBar:CreateFontString(nil, "OVERLAY")
-            valueText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
+            Utils.SafeSetFont(valueText, config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
             valueText:SetPoint("RIGHT", statusBar, "RIGHT", -4, 0)
             valueText:SetText("0")
             valueText:SetTextColor(1, 1, 1)
@@ -195,7 +198,7 @@ function BarManager:ResizeBars()
 
             -- Update font (only if text elements exist)
             if bar.labelText then
-                bar.labelText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
+                Utils.SafeSetFont(bar.labelText, config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
                 if config.fontShadow then
                     bar.labelText:SetShadowOffset(1, -1)
                 else
@@ -204,7 +207,7 @@ function BarManager:ResizeBars()
             end
 
             if bar.valueText then
-                bar.valueText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
+                Utils.SafeSetFont(bar.valueText, config.fontFace or "Fonts\\FRIZQT__.TTF", config.fontSize, config.fontOutline)
                 if config.fontShadow then
                     bar.valueText:SetShadowOffset(1, -1)
                 else

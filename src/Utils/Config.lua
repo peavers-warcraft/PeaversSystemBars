@@ -1,44 +1,60 @@
 local addonName, PSB = ...
 
--- Initialize Config namespace with default values
-PSB.Config = {
-    -- Frame settings
-    frameWidth = 200,
-    frameHeight = 100,
-    framePoint = "RIGHT",
-    frameX = -20,
-    frameY = 0,
-    lockPosition = false,
+-- Access PeaversCommons
+local PeaversCommons = _G.PeaversCommons
+local DefaultConfig = PeaversCommons and PeaversCommons.DefaultConfig
 
-    -- Bar settings
-    barHeight = 20,
-    barSpacing = 2,
-    barBgAlpha = 0.5,
-    barAlpha = 1.0,
+-- Get defaults from PeaversCommons preset or use fallback
+local defaults
+if DefaultConfig then
+    defaults = DefaultConfig.FromPreset("SystemBars")
+else
+    -- Fallback defaults if PeaversCommons not loaded yet
+    defaults = {
+        frameWidth = 200,
+        frameHeight = 100,
+        framePoint = "RIGHT",
+        frameX = -20,
+        frameY = 0,
+        lockPosition = false,
+        barHeight = 20,
+        barSpacing = 2,
+        barBgAlpha = 0.5,
+        barAlpha = 1.0,
+        fontFace = nil,
+        fontSize = 9,
+        fontOutline = "OUTLINE",
+        fontShadow = false,
+        barTexture = "Interface\\TargetingFrame\\UI-StatusBar",
+        bgAlpha = 0.8,
+        bgColor = { r = 0, g = 0, b = 0 },
+        updateInterval = 0.5,
+        showOnLogin = true,
+        showTitleBar = true,
+        showFrameBackground = true,
+        showStatNames = true,
+        showStatValues = true,
+        DEBUG_ENABLED = false,
+        customColors = {},
+    }
+end
 
-    -- Visual settings
-    fontFace = nil,
-    fontSize = 9,
-    fontOutline = "OUTLINE",
-    fontShadow = false,
+-- Initialize Config namespace with default values from preset
+PSB.Config = {}
+for key, value in pairs(defaults) do
+    if type(value) == "table" then
+        PSB.Config[key] = {}
+        for k, v in pairs(value) do
+            PSB.Config[key][k] = v
+        end
+    else
+        PSB.Config[key] = value
+    end
+end
 
-    -- Other settings
-    barTexture = "Interface\\TargetingFrame\\UI-StatusBar",
-    bgAlpha = 0.8,
-    bgColor = { r = 0, g = 0, b = 0 },
-    updateInterval = 0.5,
-    showOnLogin = true,
-    showTitleBar = true,
-    showFrameBackground = true,
-    showStatNames = true,
-    showStatValues = true,
-    DEBUG_ENABLED = false,
-    customColors = {},
-
-    -- Character identification
-    currentCharacter = nil,
-    currentRealm = nil,
-}
+-- Character identification
+PSB.Config.currentCharacter = nil
+PSB.Config.currentRealm = nil
 
 local Config = PSB.Config
 
@@ -57,8 +73,13 @@ end
 
 -- Get the appropriate default font based on client locale
 function Config:GetDefaultFont()
-    local locale = GetLocale()
+    local PeaversCommons = _G.PeaversCommons
+    if PeaversCommons and PeaversCommons.DefaultConfig then
+        return PeaversCommons.DefaultConfig.GetDefaultFont()
+    end
 
+    -- Fallback
+    local locale = GetLocale()
     if locale == "zhCN" then
         return "Fonts\\ARKai_T.ttf"
     elseif locale == "zhTW" then
@@ -250,6 +271,12 @@ end
 
 -- Returns a sorted table of available fonts, including those from LibSharedMedia
 function Config:GetFonts()
+    local PeaversCommons = _G.PeaversCommons
+    if PeaversCommons and PeaversCommons.DefaultConfig then
+        return PeaversCommons.DefaultConfig.GetFonts()
+    end
+
+    -- Fallback
     local fonts = {
         ["Fonts\\ARIALN.TTF"] = "Arial Narrow",
         ["Fonts\\FRIZQT__.TTF"] = "Default",
@@ -259,72 +286,22 @@ function Config:GetFonts()
         ["Fonts\\bLEI00D.ttf"] = "bLEI (Traditional Chinese)",
         ["Fonts\\2002.TTF"] = "2002 (Korean)"
     }
-
-    if LibStub and LibStub:GetLibrary("LibSharedMedia-3.0", true) then
-        local LSM = LibStub:GetLibrary("LibSharedMedia-3.0")
-        if LSM then
-            for name, path in pairs(LSM:HashTable("font")) do
-                fonts[path] = name
-            end
-        end
-    end
-
-    local sortedFonts = {}
-    for path, name in pairs(fonts) do
-        table.insert(sortedFonts, { path = path, name = name })
-    end
-
-    table.sort(sortedFonts, function(a, b)
-        return a.name < b.name
-    end)
-
-    local result = {}
-    for _, font in ipairs(sortedFonts) do
-        result[font.path] = font.name
-    end
-
-    return result
+    return fonts
 end
 
 -- Returns a sorted table of available statusbar textures from various sources
 function Config:GetBarTextures()
+    local PeaversCommons = _G.PeaversCommons
+    if PeaversCommons and PeaversCommons.DefaultConfig then
+        return PeaversCommons.DefaultConfig.GetBarTextures()
+    end
+
+    -- Fallback
     local textures = {
         ["Interface\\TargetingFrame\\UI-StatusBar"] = "Default",
         ["Interface\\PaperDollInfoFrame\\UI-Character-Skills-Bar"] = "Skill Bar",
         ["Interface\\PVPFrame\\UI-PVP-Progress-Bar"] = "PVP Bar",
         ["Interface\\RaidFrame\\Raid-Bar-Hp-Fill"] = "Raid"
     }
-
-    if LibStub and LibStub:GetLibrary("LibSharedMedia-3.0", true) then
-        local LSM = LibStub:GetLibrary("LibSharedMedia-3.0")
-        if LSM then
-            for name, path in pairs(LSM:HashTable("statusbar")) do
-                textures[path] = name
-            end
-        end
-    end
-
-    if _G.Details and _G.Details.statusbar_info then
-        for i, textureTable in ipairs(_G.Details.statusbar_info) do
-            if textureTable.file and textureTable.name then
-                textures[textureTable.file] = textureTable.name
-            end
-        end
-    end
-
-    local sortedTextures = {}
-    for path, name in pairs(textures) do
-        table.insert(sortedTextures, { path = path, name = name })
-    end
-
-    table.sort(sortedTextures, function(a, b)
-        return a.name < b.name
-    end)
-
-    local result = {}
-    for _, texture in ipairs(sortedTextures) do
-        result[texture.path] = texture.name
-    end
-
-    return result
+    return textures
 end
