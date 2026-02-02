@@ -26,13 +26,12 @@ function Core:Initialize()
         self.frame:SetBackdrop(nil)
     end
 
-    -- Create title bar using PeaversCommons if available
-    if PeaversCommons and PeaversCommons.TitleBar then
-        self.titleBar = PeaversCommons.TitleBar:Create(self.frame, PSB)
-    else
-        -- Create a simple title bar fallback
-        self:CreateSimpleTitleBar()
-    end
+    -- Create title bar using PeaversCommons
+    self.titleBar = PeaversCommons.TitleBar:Create(self.frame, PSB.Config, {
+        title = "PSB",
+        version = PSB.version or "1.0.0",
+        leftPadding = 5
+    })
 
     -- Create content frame for bars
     self.contentFrame = CreateFrame("Frame", nil, self.frame)
@@ -61,35 +60,6 @@ function Core:Initialize()
     else
         self.frame:Hide()
     end
-end
-
--- Create a simple title bar if PeaversCommons.TitleBar is not available
-function Core:CreateSimpleTitleBar()
-    local config = PSB.Config
-
-    local titleBar = CreateFrame("Frame", nil, self.frame, "BackdropTemplate")
-    titleBar:SetHeight(20)
-    titleBar:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0, 0)
-    titleBar:SetPoint("TOPRIGHT", self.frame, "TOPRIGHT", 0, 0)
-    titleBar:SetBackdrop({
-        bgFile = "Interface\\BUTTONS\\WHITE8X8",
-        edgeFile = nil,
-    })
-    titleBar:SetBackdropColor(0.15, 0.15, 0.15, 1)
-
-    local titleText = titleBar:CreateFontString(nil, "OVERLAY")
-    titleText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-    titleText:SetPoint("LEFT", titleBar, "LEFT", 5, 0)
-    titleText:SetText("|cff3abdf7Peavers|rSystemBars")
-    titleText:SetTextColor(1, 1, 1)
-
-    local versionText = titleBar:CreateFontString(nil, "OVERLAY")
-    versionText:SetFont(config.fontFace or "Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
-    versionText:SetPoint("RIGHT", titleBar, "RIGHT", -5, 0)
-    versionText:SetText("v" .. (PSB.version or "1.0.0"))
-    versionText:SetTextColor(0.7, 0.7, 0.7)
-
-    self.titleBar = titleBar
 end
 
 function Core:AdjustFrameHeight()

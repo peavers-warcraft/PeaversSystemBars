@@ -127,6 +127,13 @@ function ConfigUI:InitializeOptions()
     local _, newY = UI:CreateSeparator(content, baseSpacing, yPos)
     yPos = newY - baseSpacing
 
+    -- 1.5. GLOBAL APPEARANCE SECTION
+    yPos = self:CreateGlobalAppearanceOptions(content, yPos, baseSpacing, sectionSpacing)
+
+    -- Add separator
+    local _, newY = UI:CreateSeparator(content, baseSpacing, yPos)
+    yPos = newY - baseSpacing
+
     -- 2. BAR APPEARANCE SECTION
     yPos = self:CreateBarAppearanceOptions(content, yPos, baseSpacing, sectionSpacing)
 
@@ -321,6 +328,35 @@ function ConfigUI:CreateDisplayOptions(content, yPos, baseSpacing, sectionSpacin
     yPos = yPos - 65
 
     return yPos
+end
+
+-- 1.5. GLOBAL APPEARANCE
+function ConfigUI:CreateGlobalAppearanceOptions(content, yPos, baseSpacing, sectionSpacing)
+    baseSpacing = baseSpacing or 25
+
+    -- Create the global appearance section using ConfigUIUtils helper
+    local _, newY = ConfigUIUtils.CreateGlobalAppearanceSection(
+        content,
+        "PeaversSystemBars",
+        PSB,
+        baseSpacing,
+        yPos,
+        function()
+            -- Refresh UI callback when global settings change
+            if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
+                PSB.BarManager:CreateBars(PSB.Core.contentFrame)
+                PSB.Core:AdjustFrameHeight()
+            end
+            if PSB.Core and PSB.Core.UpdateFrameBackground then
+                PSB.Core:UpdateFrameBackground()
+            end
+            if ConfigUI.RefreshUI then
+                ConfigUI:RefreshUI()
+            end
+        end
+    )
+
+    return newY
 end
 
 -- 2. BAR APPEARANCE
