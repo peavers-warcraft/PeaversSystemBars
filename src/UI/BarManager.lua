@@ -117,6 +117,12 @@ function BarManager:UpdateAllBars()
             bar.statusBar:SetMinMaxValues(0, data.maxValue)
             bar.statusBar:SetValue(data.value)
 
+            -- Dynamic color for durability based on percentage
+            if statType == "DURABILITY" then
+                local color = PSB.SystemStats:GetDurabilityColor(data.value)
+                bar.statusBar:SetColor(color.r, color.g, color.b, PSB.Config.barAlpha or 1.0)
+            end
+
             -- Update value text with unit (e.g., "60 FPS")
             if bar.textManager then
                 bar.textManager:SetValueWithUnit(data.value, data.unit)
