@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- PeaversSystemBars Configuration
--- Uses PeaversCommons.ConfigManager for character-based profile management
+-- Uses PeaversCommons.ConfigManager with AceDB-3.0 for profile management
 --------------------------------------------------------------------------------
 
 local addonName, PSB = ...
@@ -21,11 +21,23 @@ local PSB_DEFAULTS = {
     showStatValues = true,
 }
 
--- Create the character-based config using ConfigManager
-PSB.Config = ConfigManager:NewCharacterBased(
+-- Create the AceDB-backed config
+PSB.Config = ConfigManager:NewWithAceDB(
     PSB,
     PSB_DEFAULTS,
-    { savedVariablesName = "PeaversSystemBarsDB" }
+    {
+        savedVariablesName = "PeaversSystemBarsDB",
+        profileType = "character",
+        onProfileChanged = function()
+            if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
+                PSB.BarManager:CreateBars(PSB.Core.contentFrame)
+                PSB.Core:AdjustFrameHeight()
+            end
+            if PSB.Core and PSB.Core.UpdateFrameBackground then
+                PSB.Core:UpdateFrameBackground()
+            end
+        end,
+    }
 )
 
 return PSB.Config
