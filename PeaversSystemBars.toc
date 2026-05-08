@@ -12,7 +12,7 @@
 ## X-Source-Code: https://github.com/peavers-warcraft/PeaversSystemBars
 ## X-Curse-Project-ID: 1451622
 
-## Dependencies: PeaversCommons
+## Dependencies: PeaversCommons, PeaversConfig
 ## SavedVariables: PeaversSystemBarsDB
 
 Changelog.lua
