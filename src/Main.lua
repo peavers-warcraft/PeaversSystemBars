@@ -59,14 +59,22 @@ PeaversCommons.Events:Init(addonName, function()
     -- Register common events (logout save, combat visibility, group updates)
     AddonInit:RegisterCommonEvents(PSB)
 
-    -- Create settings pages
-    AddonInit:CreateSettingsPages(
-        PSB,
-        "PeaversSystemBars",
-        "Peavers System Bars",
-        "Displays FPS and latency as visual status bars.",
-        {"/psb - Toggle display", "/psb config - Open settings"}
-    )
+    C_Timer.After(0.5, function()
+        PeaversCommons.SettingsUI:CreateRedirectPage(PSB, "PeaversSystemBars", "Peavers System Bars")
+    end)
+
+    -- Register with PeaversConfig registry
+    if PeaversCommons.ConfigRegistry then
+        PeaversCommons.ConfigRegistry:Register({
+            name = "PeaversSystemBars",
+            displayName = "System Bars",
+            description = "FPS and latency as visual status bars",
+            addonRef = PSB,
+            config = PSB.Config,
+            pages = PSB.ConfigUI:GetPages(),
+            order = 5,
+        })
+    end
 end, {
     suppressAnnouncement = true
 })
