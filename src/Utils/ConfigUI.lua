@@ -163,7 +163,7 @@ function ConfigUI:BuildColorsPage(parentFrame)
                     Config:Save()
                     if PSB.BarManager and PSB.BarManager.bars and PSB.BarManager.bars[statType] then
                         local bar = PSB.BarManager.bars[statType]
-                        bar.statusBar:SetStatusBarColor(newR, newG, newB, Config.barAlpha or 1.0)
+                        bar.statusBar:SetColor(newR, newG, newB, Config.barAlpha or 1.0)
                     end
                 end,
             })
