@@ -29,12 +29,23 @@ PSB.Config = ConfigManager:NewWithAceDB(
         savedVariablesName = "PeaversSystemBarsDB",
         profileType = "character",
         onProfileChanged = function()
-            if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
+            if not PSB.Core or not PSB.Core.frame then return end
+
+            PSB.Core.frame:SetWidth(PSB.Config.frameWidth)
+            PSB.Core:ApplyFramePosition()
+
+            if PSB.BarManager and PSB.Core.contentFrame then
                 PSB.BarManager:CreateBars(PSB.Core.contentFrame)
+                PSB.BarManager:ResizeBars()
                 PSB.Core:AdjustFrameHeight()
             end
-            if PSB.Core and PSB.Core.UpdateFrameBackground then
-                PSB.Core:UpdateFrameBackground()
+
+            PSB.Core:UpdateFrameBackground()
+            PSB.Core:UpdateTitleBarVisibility()
+            PSB.Core:UpdateFrameLock()
+
+            if PSB.Core.UpdateVisibility then
+                PSB.Core:UpdateVisibility()
             end
         end,
     }
