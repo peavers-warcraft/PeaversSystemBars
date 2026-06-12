@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: PeaversSystemBars
+  description: "A World of Warcraft addon that displays FPS and latency as minimal, movable status bars."
+  annotations:
+    github.com/project-slug: peavers-warcraft/PeaversSystemBars
+spec:
+  type: library
+  lifecycle: production
+  owner: peavers-warcraft
