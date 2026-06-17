@@ -1,6 +1,5 @@
 local _, PSB = ...
 local Config = PSB.Config
-local UI = PSB.UI
 
 local ConfigUI = {}
 PSB.ConfigUI = ConfigUI
@@ -13,7 +12,6 @@ end
 
 local SettingsObjects = PeaversCommons.SettingsObjects
 local W = PeaversCommons.Widgets
-local C = W.Colors
 local ConfigUIUtils = PeaversCommons.ConfigUIUtils
 
 local function RefreshBars()
