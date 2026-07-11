@@ -32,6 +32,7 @@ Access settings through the game's addon options or `/psb config` to customize:
 - Frame lock/unlock
 <!-- /peavers:configuration -->
 
+
 ## Installation
 
 ### Recommended: PeaversUpdater
