@@ -1,5 +1,7 @@
 # PeaversSystemBars
 
+[![AddonSentry](https://api.addonsentry.io/api/public/repos/peavers-warcraft/PeaversSystemBars/badge.svg)](https://addonsentry.io/dashboard/peavers-warcraft/PeaversSystemBars)
+
 A World of Warcraft addon that displays FPS and latency as minimal, movable status bars.
 
 ## Features
