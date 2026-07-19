@@ -13,7 +13,6 @@ local AddonInit = PeaversCommons.AddonInit
 local success = AddonInit:Setup(PSB, addonName, {
     modules = {"Core", "UI", "Utils", "Config", "SystemStats"},
     slashCommand = "psb",
-    toggleFunctionName = "ToggleSystemBarsDisplay",
     extraSlashCommands = {}
 })
 
