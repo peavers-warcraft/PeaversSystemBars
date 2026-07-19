@@ -79,7 +79,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     local _, newY = W:CreateSectionHeader(parentFrame, "Display", opts.indent, y)
     y = newY - 8
 
-    local toggle1 = W:CreateToggle(parentFrame, "Show Frame Background", {
+    local toggle1 = W:CreateCheckbox(parentFrame, "Show Frame Background", {
         checked = Config.showFrameBackground ~= false,
         width = opts.width,
         onChange = function(checked)
@@ -91,7 +91,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     toggle1:SetPoint("TOPLEFT", opts.indent, y)
     y = y - 30
 
-    local toggle2 = W:CreateToggle(parentFrame, "Show Stat Names", {
+    local toggle2 = W:CreateCheckbox(parentFrame, "Show Stat Names", {
         checked = Config.showStatNames ~= false,
         width = opts.width,
         onChange = function(checked)
@@ -103,7 +103,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
     toggle2:SetPoint("TOPLEFT", opts.indent, y)
     y = y - 30
 
-    local toggle3 = W:CreateToggle(parentFrame, "Show Stat Values", {
+    local toggle3 = W:CreateCheckbox(parentFrame, "Show Stat Values", {
         checked = Config.showStatValues ~= false,
         width = opts.width,
         onChange = function(checked)
