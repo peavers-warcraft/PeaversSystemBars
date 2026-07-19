@@ -173,8 +173,29 @@ function ConfigUI:BuildColorsPage(parentFrame)
     parentFrame:SetHeight(math.abs(y) + 30)
 end
 
+function ConfigUI:BuildInfoPage(parentFrame)
+    PeaversCommons.ConfigUIUtils.BuildInfoPage(parentFrame, "System Bars", {
+        "Shows your FPS and latency as small, movable status bars: green for " ..
+            "frames per second, blue for home latency, orange for world latency.",
+        { command = "/psb", desc = "toggle the bars" },
+        { command = "/psb config", desc = "open the configuration panel" },
+
+        { header = "Home versus world latency" },
+        "Home latency is your connection to the realm server - chat, guild, " ..
+            "and auction house. World latency is the server actually running " ..
+            "combat, movement, and spells; it is the number that matters when " ..
+            "the game feels laggy.",
+
+        { header = "How the bars scale" },
+        "Each bar sizes itself against the highest value seen in the last 30 " ..
+            "seconds rather than a fixed maximum, so it stays readable whether " ..
+            "you sit at 40 FPS or 200. Values refresh every half second.",
+    })
+end
+
 function ConfigUI:GetPages()
     return {
+        { key = "info", label = "Information", builder = function(f) ConfigUI:BuildInfoPage(f) end },
         { key = "general", label = "General", builder = function(f) ConfigUI:BuildGeneralPage(f) end },
         { key = "bars", label = "Bars & Text", builder = function(f) ConfigUI:BuildBarsPage(f) end },
         { key = "colors", label = "Colors", builder = function(f) ConfigUI:BuildColorsPage(f) end },
