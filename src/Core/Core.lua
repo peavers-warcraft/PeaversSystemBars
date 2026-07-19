@@ -9,7 +9,7 @@ function Core:Initialize()
     local config = PSB.Config
 
     -- Create main frame
-    self.frame = CreateFrame("Frame", "PeaversSystemBarsFrame", UIParent, "BackdropTemplate")
+    self.frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
     self.frame:SetSize(config.frameWidth, 100) -- Height will be adjusted
 
     -- Apply background based on showFrameBackground setting
