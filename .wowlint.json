@@ -1,4 +1,5 @@
 {
-  "_comment": "PSB is the established short alias for this addon.",
-  "framePrefixes": ["PSB"]
+  "framePrefixes": [
+    "PSB"
+  ]
 }
