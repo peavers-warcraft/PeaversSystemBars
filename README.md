@@ -1,8 +1,48 @@
 # PeaversSystemBars
 
+[![Ultra Performance](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/peavers-warcraft/PeaversSystemBars/master/.github/badges/perf.json)](https://github.com/peavers-warcraft/PeaversSystemBars/actions/workflows/perf.yml)
 [![AddonSentry](https://addonsentry.io/api/public/repos/peavers-warcraft/PeaversSystemBars/badge.svg)](https://addonsentry.io/dashboard/peavers-warcraft/PeaversSystemBars)
 
 A World of Warcraft addon that displays FPS and latency as minimal, movable status bars.
+
+Part of the **Peavers Ultra Performance** family: addons that hold themselves to a published budget, measured on every push.
+
+## Measured performance
+
+An addon that watches your framerate has no business costing you any. This one
+does **no per-frame work at all** — there is not a single `OnUpdate` handler
+anywhere in `src/`. The bars refresh on a timer instead, and the table below is
+what one refresh actually costs, regenerated on every push by the
+[Ultra Performance harness](https://github.com/peavers-code/peavers-warcraft-workflows/tree/master/perf-harness)
+driving the real `BarManager:UpdateAllBars` loop. If any number goes outside
+`perf/budget.json`, the build fails.
+
+<!-- perf:begin -->
+
+> Measured on every push by the Ultra Performance harness. The build fails if any number here exceeds the budget in `perf/budget.json`.
+
+| Check | Measured | Budget | |
+|---|---:|---:|:--:|
+| Packaged size | 46.2 KB | 80 KB | pass |
+| Bundled libraries | 0 | 0 | pass |
+| Widget calls per frame | 0 | 0 | pass |
+| Widget calls per second while idle | 0 | 0 | pass |
+| Widget calls per second | 32 | 40 | pass |
+
+Scenarios driven against the real addon source, outside the game:
+
+| Scenario | Calls/frame | Calls/sec | Notes |
+|---|---:|---:|---|
+| 5 bars refreshed, every 0.5s | 0.00 | 32.0 | 16 calls per tick, 200 ticks driven |
+| idle, between ticks | 0.00 | - | no OnUpdate handler exists anywhere in src/ |
+
+<sub>1,318 lines of Lua · 46.2 KB packaged · no bundled libraries</sub>
+
+<!-- perf:end -->
+
+The per-second figure is the honest unit here: five bars cost three calls each
+per refresh, plus one colour change for durability, twice a second. Raising
+**Update interval** in the settings lowers it proportionally.
 
 ## Features
 
