@@ -8,6 +8,7 @@
 -- BarManager:UpdateAllBars loop, driven at the shipped update interval.
 --------------------------------------------------------------------------------
 
+---@diagnostic disable-next-line: undefined-global
 local Stubs = dofile(HARNESS_LIB .. "/wow-stubs.lua").Install()
 
 -- The interval BarManager runs at. Config default; UpdateHandler passes it
@@ -18,6 +19,7 @@ local UPDATE_INTERVAL = 0.5
 -- PeaversCommons surface BarManager.lua touches at load time
 --------------------------------------------------------------------------------
 
+---@diagnostic disable-next-line: missing-fields
 _G.PeaversCommons = {
     AnimatedStatusBar = {},
     BarTextManager = {},
@@ -52,6 +54,7 @@ PSB.SystemStats = {
     GetDurabilityColor = function() return { r = 0.2, g = 0.8, b = 0.2 } end,
 }
 
+---@diagnostic disable-next-line: undefined-global
 assert(loadfile(ADDON_DIR .. "/src/UI/BarManager.lua"))("PeaversSystemBars", PSB)
 local BarManager = PSB.BarManager
 
