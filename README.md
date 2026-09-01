@@ -23,7 +23,7 @@ driving the real `BarManager:UpdateAllBars` loop. If any number goes outside
 
 | Check | Measured | Budget | |
 |---|---:|---:|:--:|
-| Packaged size | 46.1 KB | 80 KB | pass |
+| Packaged size | 46.4 KB | 80 KB | pass |
 | Bundled libraries | 0 | 0 | pass |
 | Widget calls per frame | 0 | 0 | pass |
 | Widget calls per second while idle | 0 | 0 | pass |
@@ -36,7 +36,7 @@ Scenarios driven against the real addon source, outside the game:
 | 5 bars refreshed, every 0.5s | 0.00 | 32.0 | 16 calls per tick, 200 ticks driven |
 | idle, between ticks | 0.00 | - | no OnUpdate handler exists anywhere in src/ |
 
-<sub>1,318 lines of Lua · 46.1 KB packaged · no bundled libraries</sub>
+<sub>1,318 lines of Lua · 46.4 KB packaged · no bundled libraries</sub>
 
 <!-- perf:end -->
 
