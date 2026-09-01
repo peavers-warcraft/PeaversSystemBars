@@ -18,6 +18,7 @@ local UPDATE_INTERVAL = 0.5
 -- PeaversCommons surface BarManager.lua touches at load time
 --------------------------------------------------------------------------------
 
+---@diagnostic disable-next-line: missing-fields
 _G.PeaversCommons = {
     AnimatedStatusBar = {},
     BarTextManager = {},
