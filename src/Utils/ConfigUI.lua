@@ -10,141 +10,27 @@ if not PeaversCommons then
     return
 end
 
-local SettingsObjects = PeaversCommons.SettingsObjects
-local W = PeaversCommons.Widgets
 local ConfigUIUtils = PeaversCommons.ConfigUIUtils
 
--- Applying a setting lives with the addon's schema now, so the settings page
--- and the Edit Mode dialog cannot disagree about what a change should do.
-local function OnSettingChanged(key, value)
-    PSB.ApplySetting(key, value)
-end
+--------------------------------------------------------------------------------
+-- Where the settings went
+--
+-- Every setting the bars have is in Blizzard's Edit Mode now: select the frame
+-- and the dialog holds its width and whether the title bar and background show,
+-- with a button per group for the rest.
+--
+-- This page is deliberately not a second copy of them. Two places to change one
+-- setting is worse than one place that takes a moment to find. What is left is
+-- what a settings page is actually for - explaining what the thing does.
+--------------------------------------------------------------------------------
 
-local pageOpts = {
-    indent = 25,
-    width = 360,
-    onChanged = OnSettingChanged,
-}
-
-local function GetPageOpts(parentFrame)
-    local opts = {}
-    for k, v in pairs(pageOpts) do opts[k] = v end
-    local frameWidth = parentFrame:GetWidth()
-    if frameWidth and frameWidth > 100 then
-        opts.width = frameWidth - (opts.indent * 2) - 10
-    end
-    return opts
-end
-
-function ConfigUI:BuildGeneralPage(parentFrame)
-    local y = -10
-    local opts = GetPageOpts(parentFrame)
-
-    y = SettingsObjects.FrameSettings(parentFrame, Config, y, opts)
-
-    local _, newY = W:CreateSectionHeader(parentFrame, "Display", opts.indent, y)
-    y = newY - 8
-
-    local toggle1 = W:CreateCheckbox(parentFrame, "Show Frame Background", {
-        checked = Config.showFrameBackground ~= false,
-        width = opts.width,
-        onChange = function(checked)
-            Config.showFrameBackground = checked
-            Config:Save()
-            PSB.ApplySetting("showFrameBackground", checked)
-        end,
-    })
-    toggle1:SetPoint("TOPLEFT", opts.indent, y)
-    y = y - 30
-
-    local toggle2 = W:CreateCheckbox(parentFrame, "Show Stat Names", {
-        checked = Config.showStatNames ~= false,
-        width = opts.width,
-        onChange = function(checked)
-            Config.showStatNames = checked
-            Config:Save()
-            PSB.ApplySetting("showStatNames", checked)
-        end,
-    })
-    toggle2:SetPoint("TOPLEFT", opts.indent, y)
-    y = y - 30
-
-    local toggle3 = W:CreateCheckbox(parentFrame, "Show Stat Values", {
-        checked = Config.showStatValues ~= false,
-        width = opts.width,
-        onChange = function(checked)
-            Config.showStatValues = checked
-            Config:Save()
-            PSB.ApplySetting("showStatValues", checked)
-        end,
-    })
-    toggle3:SetPoint("TOPLEFT", opts.indent, y)
-    y = y - 30
-
-    y = y - 10
-    y = SettingsObjects.Visibility(parentFrame, Config, y, opts)
-    y = SettingsObjects.UpdateInterval(parentFrame, Config, y, opts)
-
-    parentFrame:SetHeight(math.abs(y) + 30)
-end
-
-function ConfigUI:BuildBarsPage(parentFrame)
-    local y = -10
-    local opts = GetPageOpts(parentFrame)
-
-    y = SettingsObjects.BarAppearance(parentFrame, Config, y, opts)
-    y = SettingsObjects.FontSettings(parentFrame, Config, y, opts)
-
-    parentFrame:SetHeight(math.abs(y) + 30)
-end
-
-function ConfigUI:BuildColorsPage(parentFrame)
-    local y = -10
-    local opts = GetPageOpts(parentFrame)
-    local indent = opts.indent
-    local width = opts.width
-
-    local _, newY = W:CreateSectionHeader(parentFrame, "Stat Colors", indent, y)
-    y = newY - 8
-
-    if PSB.SystemStats and PSB.SystemStats.STAT_ORDER then
-        for _, statType in ipairs(PSB.SystemStats.STAT_ORDER) do
-            local statName = PSB.SystemStats:GetName(statType)
-            local color = PSB.SystemStats:GetColor(statType)
-            local r, g, b = color.r, color.g, color.b
-
-            if Config.customColors and Config.customColors[statType] then
-                local custom = Config.customColors[statType]
-                r, g, b = custom.r, custom.g, custom.b
-            end
-
-            local colorPicker = W:CreateColorPicker(parentFrame, statName, {
-                r = r, g = g, b = b,
-                width = width,
-                onChange = function(newR, newG, newB)
-                    Config.customColors = Config.customColors or {}
-                    Config.customColors[statType] = { r = newR, g = newG, b = newB }
-                    Config:Save()
-                    if PSB.BarManager and PSB.BarManager.bars and PSB.BarManager.bars[statType] then
-                        local bar = PSB.BarManager.bars[statType]
-                        bar.statusBar:SetColor(newR, newG, newB, Config.barAlpha or 1.0)
-                    end
-                end,
-            })
-            colorPicker:SetPoint("TOPLEFT", indent, y)
-            y = y - 30
-        end
-    end
-
-    parentFrame:SetHeight(math.abs(y) + 30)
-end
-
+-- Applying a setting lives with the addon's schema, so the settings page and the
+-- Edit Mode panel cannot disagree about what a change should do.
 function ConfigUI:BuildInfoPage(parentFrame)
-    PeaversCommons.ConfigUIUtils.BuildInfoPage(parentFrame, "System Bars", {
+    ConfigUIUtils.BuildInfoPageWithEditMode(parentFrame, "System Bars", {
         "Shows your FPS and latency as small, movable status bars: green for " ..
             "frames per second, blue for home latency, orange for world latency.",
         { command = "/psb", desc = "toggle the bars" },
-        { command = "/psb config", desc = "open the configuration panel" },
 
         { header = "Home versus world latency" },
         "Home latency is your connection to the realm server - chat, guild, " ..
@@ -156,33 +42,38 @@ function ConfigUI:BuildInfoPage(parentFrame)
         "Each bar sizes itself against the highest value seen in the last 30 " ..
             "seconds rather than a fixed maximum, so it stays readable whether " ..
             "you sit at 40 FPS or 200. Values refresh every half second.",
+    }, {
+        title = "the system bars",
+        select = "the bars",
+        reset = function()
+            PSB.Config:Reset()
+            if PSB.ApplySetting then PSB.ApplySetting() end
+            if PeaversCommons.EditModePanel then
+                PeaversCommons.EditModePanel:Refresh()
+            end
+        end,
     })
 end
+
+--------------------------------------------------------------------------------
+-- Pages
+--------------------------------------------------------------------------------
 
 function ConfigUI:GetPages()
     return {
         { key = "info", label = "Information", builder = function(f) ConfigUI:BuildInfoPage(f) end },
-        { key = "general", label = "General", builder = function(f) ConfigUI:BuildGeneralPage(f) end },
-        { key = "bars", label = "Bars & Text", builder = function(f) ConfigUI:BuildBarsPage(f) end },
-        { key = "colors", label = "Colors", builder = function(f) ConfigUI:BuildColorsPage(f) end },
     }
 end
 
 function ConfigUI:BuildIntoFrame(parentFrame)
-    local y = -10
-    y = SettingsObjects.FrameSettings(parentFrame, Config, y, pageOpts)
-    y = SettingsObjects.BarAppearance(parentFrame, Config, y, pageOpts)
-    y = SettingsObjects.FontSettings(parentFrame, Config, y, pageOpts)
-    y = SettingsObjects.Visibility(parentFrame, Config, y, pageOpts)
-    y = SettingsObjects.UpdateInterval(parentFrame, Config, y, pageOpts)
-    parentFrame:SetHeight(math.abs(y) + 30)
+    self:BuildInfoPage(parentFrame)
     return parentFrame
 end
 
 function ConfigUI:InitializeOptions()
     local panel = ConfigUIUtils.CreateSettingsPanel(
-        "Settings",
-        "Configuration options for the system bars display"
+        "System Bars",
+        "The bars are configured in Blizzard's Edit Mode"
     )
     local content = panel.content
     self:BuildIntoFrame(content)
@@ -191,7 +82,7 @@ function ConfigUI:InitializeOptions()
 end
 
 function ConfigUI:OpenOptions()
-    PSB.Config:Save()
+    Config:Save()
 
     if _G.PeaversConfig and _G.PeaversConfig.MainFrame then
         _G.PeaversConfig.MainFrame:Show()
@@ -201,27 +92,21 @@ function ConfigUI:OpenOptions()
 
     if Settings and Settings.OpenToCategory then
         if PSB.directSettingsCategoryID then
-            local success = pcall(Settings.OpenToCategory, PSB.directSettingsCategoryID)
-            if success then return end
+            local ok = pcall(Settings.OpenToCategory, PSB.directSettingsCategoryID)
+            if ok then return end
         end
         if PSB.directCategoryID then
-            local success = pcall(Settings.OpenToCategory, PSB.directCategoryID)
-            if success then return end
+            local ok = pcall(Settings.OpenToCategory, PSB.directCategoryID)
+            if ok then return end
         end
     end
 
     if SettingsPanel then
         ShowUIPanel(SettingsPanel)
-        return
-    end
-
-    if InterfaceOptionsFrame_OpenToCategory then
-        InterfaceOptionsFrame_OpenToCategory("PeaversSystemBars")
-        InterfaceOptionsFrame_OpenToCategory("PeaversSystemBars")
     end
 end
 
-PSB.Config.OpenOptionsCommand = function()
+Config.OpenOptionsCommand = function()
     ConfigUI:OpenOptions()
 end
 
