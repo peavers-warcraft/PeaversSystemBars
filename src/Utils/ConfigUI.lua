@@ -14,44 +14,10 @@ local SettingsObjects = PeaversCommons.SettingsObjects
 local W = PeaversCommons.Widgets
 local ConfigUIUtils = PeaversCommons.ConfigUIUtils
 
-local function RefreshBars()
-    if PSB.BarManager and PSB.Core and PSB.Core.contentFrame then
-        PSB.BarManager:CreateBars(PSB.Core.contentFrame)
-        PSB.Core:AdjustFrameHeight()
-    end
-end
-
+-- Applying a setting lives with the addon's schema now, so the settings page
+-- and the Edit Mode dialog cannot disagree about what a change should do.
 local function OnSettingChanged(key, value)
-    if key == "frameWidth" then
-        if PSB.Core and PSB.Core.frame then
-            PSB.Core.frame:SetWidth(value)
-            if PSB.BarManager then PSB.BarManager:ResizeBars() end
-        end
-    elseif key == "bgAlpha" or key == "bgColor" then
-        if PSB.Core and PSB.Core.frame then
-            local color = Config.bgColor or { r = 0, g = 0, b = 0 }
-            PSB.Core.frame:SetBackdropColor(color.r, color.g, color.b, Config.bgAlpha or 0.8)
-            PSB.Core.frame:SetBackdropBorderColor(0, 0, 0, Config.bgAlpha or 0.8)
-        end
-    elseif key == "lockPosition" then
-        if PSB.Core then PSB.Core:UpdateFrameLock() end
-    elseif key == "showTitleBar" then
-        if PSB.Core then PSB.Core:UpdateTitleBarVisibility() end
-    elseif key == "barAlpha" or key == "barBgAlpha" or key == "barTexture" then
-        if PSB.BarManager then PSB.BarManager:ResizeBars() end
-    elseif key == "barHeight" or key == "barSpacing" then
-        RefreshBars()
-    elseif key == "fontFace" or key == "fontSize" or key == "fontOutline" or key == "fontShadow" then
-        RefreshBars()
-    elseif key == "updateInterval" then
-        if PSB.UpdateHandler and PSB.UpdateHandler.Restart then
-            PSB.UpdateHandler:Restart()
-        end
-    elseif key == "displayMode" or key == "hideOutOfCombat" or key == "showOnLogin" then
-        if PSB.Core and PSB.Core.UpdateVisibility then
-            PSB.Core:UpdateVisibility()
-        end
-    end
+    PSB.ApplySetting(key, value)
 end
 
 local pageOpts = {
@@ -85,7 +51,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
         onChange = function(checked)
             Config.showFrameBackground = checked
             Config:Save()
-            if PSB.Core then PSB.Core:UpdateFrameBackground() end
+            PSB.ApplySetting("showFrameBackground", checked)
         end,
     })
     toggle1:SetPoint("TOPLEFT", opts.indent, y)
@@ -97,7 +63,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
         onChange = function(checked)
             Config.showStatNames = checked
             Config:Save()
-            RefreshBars()
+            PSB.ApplySetting("showStatNames", checked)
         end,
     })
     toggle2:SetPoint("TOPLEFT", opts.indent, y)
@@ -109,7 +75,7 @@ function ConfigUI:BuildGeneralPage(parentFrame)
         onChange = function(checked)
             Config.showStatValues = checked
             Config:Save()
-            RefreshBars()
+            PSB.ApplySetting("showStatValues", checked)
         end,
     })
     toggle3:SetPoint("TOPLEFT", opts.indent, y)

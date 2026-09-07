@@ -25,6 +25,7 @@ src\UI\UI.lua
 
 src\Utils\Config.lua
 src\Utils\ConfigUI.lua
+src\Utils\EditMode.lua
 
 src\System\SystemStats.lua
 
