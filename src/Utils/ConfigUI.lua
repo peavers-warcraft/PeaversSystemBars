@@ -27,17 +27,10 @@ local ConfigUIUtils = PeaversCommons.ConfigUIUtils
 -- Applying a setting lives with the addon's schema, so the settings page and the
 -- Edit Mode panel cannot disagree about what a change should do.
 function ConfigUI:BuildInfoPage(parentFrame)
-    ConfigUIUtils.BuildInfoPage(parentFrame, "System Bars", {
+    ConfigUIUtils.BuildInfoPageWithEditMode(parentFrame, "System Bars", {
         "Shows your FPS and latency as small, movable status bars: green for " ..
             "frames per second, blue for home latency, orange for world latency.",
         { command = "/psb", desc = "toggle the bars" },
-
-        { header = "Settings are in Edit Mode" },
-        "Open Edit Mode from the game menu, select the bars, and their settings " ..
-            "open beside the Edit Mode dialog: width, bar height and spacing, " ..
-            "fonts, stat colours, visibility and update rate, and typed position " ..
-            "offsets. Drag to place them, or nudge a pixel at a time with the " ..
-            "arrow keys and ten at a time with Shift held.",
 
         { header = "Home versus world latency" },
         "Home latency is your connection to the realm server - chat, guild, " ..
@@ -49,6 +42,16 @@ function ConfigUI:BuildInfoPage(parentFrame)
         "Each bar sizes itself against the highest value seen in the last 30 " ..
             "seconds rather than a fixed maximum, so it stays readable whether " ..
             "you sit at 40 FPS or 200. Values refresh every half second.",
+    }, {
+        title = "the system bars",
+        select = "the bars",
+        reset = function()
+            PSB.Config:Reset()
+            if PSB.ApplySetting then PSB.ApplySetting() end
+            if PeaversCommons.EditModePanel then
+                PeaversCommons.EditModePanel:Refresh()
+            end
+        end,
     })
 end
 
