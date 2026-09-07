@@ -36,6 +36,25 @@ end
 function PSB.ApplySetting(key, value)
     local Config = PSB.Config
 
+    -- Stat colours are keyed by stat, so they are matched by prefix. Only the
+    -- one bar that changed is repainted.
+    local statType = key:match("^statColor%.(.+)$")
+    if statType then
+        local bars = PSB.BarManager and PSB.BarManager.bars
+        local bar = bars and bars[statType]
+        if bar and bar.statusBar and value then
+            bar.statusBar:SetColor(value.r, value.g, value.b, Config.barAlpha or 1.0)
+        end
+        return
+    end
+
+    if key == "frameX" or key == "frameY" then
+        if PSB.Core and PSB.Core.ApplyFramePosition then
+            PSB.Core:ApplyFramePosition()
+        end
+        return
+    end
+
     if key == "frameWidth" then
         if PSB.Core and PSB.Core.frame then
             PSB.Core.frame:SetWidth(value)
@@ -70,68 +89,110 @@ end
 --------------------------------------------------------------------------------
 -- The settings
 --
--- "both" is anything you decide by looking at the bars while you drag a slider.
--- "config" is anything picked off a list once and then forgotten - display
--- modes, update rates, fonts - which the settings page has room to explain and
--- the dialog does not. Locking the position is config-only for a plainer
--- reason: in Edit Mode, moving the frame is the entire point.
+-- All of them, in groups. The dialog itself shows only the first; the rest are
+-- buttons that open the settings panel beside it, which scrolls and has room to
+-- explain what it is offering.
 --------------------------------------------------------------------------------
 
 EditMode.SECTIONS = {
     { key = "frame", label = "Frame" },
+    { key = "position", label = "Position" },
     { key = "bars", label = "Bars" },
     { key = "text", label = "Text" },
+    { key = "colors", label = "Colours" },
     { key = "behaviour", label = "Behaviour" },
 }
 
 EditMode.ENTRIES = {
     -- Frame
-    { key = "frameWidth", section = "frame", surface = "both" },
-    { key = "showTitleBar", section = "frame", surface = "both" },
+    { key = "frameWidth", section = "frame" },
+    { key = "showTitleBar", section = "frame" },
     {
-        key = "showFrameBackground", section = "frame", surface = "both",
+        key = "showFrameBackground", section = "frame",
         label = "Show Frame Background", kind = "checkbox", default = true,
     },
-    { key = "bgColor", section = "frame", surface = "both" },
-    { key = "bgAlpha", section = "frame", surface = "both" },
-    { key = "lockPosition", section = "frame", surface = "config" },
+    { key = "bgColor", section = "frame" },
+    { key = "bgAlpha", section = "frame" },
+    { key = "lockPosition", section = "frame" },
+
+    -- Position. Dragging in Edit Mode sets the anchor point as well as the
+    -- offset, so these two are the fine adjustment rather than the whole story;
+    -- the anchor they are measured from is whichever edge the frame was last
+    -- dropped nearest.
+    { key = "frameX", section = "position", kind = "number" },
+    { key = "frameY", section = "position", kind = "number" },
 
     -- Bars
-    { key = "barHeight", section = "bars", surface = "both" },
-    { key = "barSpacing", section = "bars", surface = "both" },
-    { key = "barAlpha", section = "bars", surface = "both" },
-    { key = "barBgAlpha", section = "bars", surface = "both" },
-    { key = "barTexture", section = "bars", surface = "config", height = 300 },
+    { key = "barHeight", section = "bars" },
+    { key = "barSpacing", section = "bars" },
+    { key = "barAlpha", section = "bars" },
+    { key = "barBgAlpha", section = "bars" },
+    { key = "barTexture", section = "bars", height = 300 },
 
     -- Text
     {
-        key = "showStatNames", section = "text", surface = "both",
+        key = "showStatNames", section = "text",
         label = "Show Stat Names", kind = "checkbox", default = true,
     },
     {
-        key = "showStatValues", section = "text", surface = "both",
+        key = "showStatValues", section = "text",
         label = "Show Stat Values", kind = "checkbox", default = true,
     },
-    { key = "fontSize", section = "text", surface = "both" },
-    { key = "textAlpha", section = "text", surface = "both" },
-    { key = "fontFace", section = "text", surface = "config", height = 300 },
-    { key = "fontOutline", section = "text", surface = "config" },
-    { key = "fontShadow", section = "text", surface = "config" },
+    { key = "fontSize", section = "text" },
+    { key = "textAlpha", section = "text" },
+    { key = "fontFace", section = "text", height = 300 },
+    { key = "fontOutline", section = "text" },
+    { key = "fontShadow", section = "text" },
 
     -- Behaviour. None of it belongs in a dialog you open to move things.
-    { key = "showOnLogin", section = "behaviour", surface = "config" },
-    { key = "hideOutOfCombat", section = "behaviour", surface = "config" },
-    { key = "displayMode", section = "behaviour", surface = "config" },
-    { key = "updateInterval", section = "behaviour", surface = "config" },
+    { key = "showOnLogin", section = "behaviour" },
+    { key = "hideOutOfCombat", section = "behaviour" },
+    { key = "displayMode", section = "behaviour" },
+    { key = "updateInterval", section = "behaviour" },
 }
+
+-- One colour per stat, built from whatever SystemStats is tracking rather than
+-- listed here, so a new stat brings its own colour picker with it. Each is
+-- stored inside a table keyed by stat rather than in a field of its own, which
+-- is what the getValue/setValue pair is for.
+local function ColourEntries()
+    local entries = {}
+
+    local Stats = PSB.SystemStats
+    if not (Stats and Stats.STAT_ORDER) then return entries end
+
+    for _, statType in ipairs(Stats.STAT_ORDER) do
+        entries[#entries + 1] = {
+            key = "statColor." .. statType,
+            label = Stats:GetName(statType),
+            kind = "color",
+            section = "colors",
+            default = Stats:GetColor(statType),
+            getValue = function(config)
+                local custom = config.customColors and config.customColors[statType]
+                return custom or Stats:GetColor(statType)
+            end,
+            setValue = function(config, _, value)
+                config.customColors = config.customColors or {}
+                config.customColors[statType] = value
+            end,
+        }
+    end
+
+    return entries
+end
 
 function EditMode:BuildSchema()
     if self.schema then return self.schema end
 
+    local entries = {}
+    for _, entry in ipairs(self.ENTRIES) do entries[#entries + 1] = entry end
+    for _, entry in ipairs(ColourEntries()) do entries[#entries + 1] = entry end
+
     self.schema = PeaversCommons.SettingsSchema:New({
         config = PSB.Config,
         sections = self.SECTIONS,
-        entries = self.ENTRIES,
+        entries = entries,
         apply = function(entry, _, value) PSB.ApplySetting(entry.key, value) end,
     })
 
