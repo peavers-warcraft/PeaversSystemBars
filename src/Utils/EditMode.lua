@@ -34,8 +34,6 @@ local function RefreshBars()
 end
 
 function PSB.ApplySetting(key, value)
-    local Config = PSB.Config
-
     if key == "frameWidth" then
         if PSB.Core and PSB.Core.frame then
             PSB.Core.frame:SetWidth(value)
