@@ -50,6 +50,13 @@ PeaversCommons.Events:Init(addonName, function()
     -- Initialize core components
     PSB.Core:Initialize()
 
+    -- After Core, because it registers the frame Core builds. Silently does
+    -- nothing if LibEditMode failed to load, leaving the settings page and the
+    -- drag handle as they were.
+    if PSB.EditMode then
+        PSB.EditMode:Register()
+    end
+
     -- Start the update handler
     if PSB.UpdateHandler and PSB.UpdateHandler.Start then
         PSB.UpdateHandler:Start()
