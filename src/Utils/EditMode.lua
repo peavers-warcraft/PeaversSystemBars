@@ -80,8 +80,8 @@ function PSB.ApplySetting(key, value)
             PSB.UpdateHandler:Restart()
         end
     elseif key == "displayMode" or key == "hideOutOfCombat" or key == "showOnLogin" then
-        if PSB.Core and PSB.Core.UpdateVisibility then
-            PSB.Core:UpdateVisibility()
+        if PSB.Core and PSB.Core.UpdateFrameVisibility then
+            PSB.Core:UpdateFrameVisibility()
         end
     end
 end
@@ -251,7 +251,7 @@ function EditMode:Register()
         end,
         onExit = function()
             if PSB.Core.UpdateFrameLock then PSB.Core:UpdateFrameLock() end
-            if PSB.Core.UpdateVisibility then PSB.Core:UpdateVisibility() end
+            if PSB.Core.UpdateFrameVisibility then PSB.Core:UpdateFrameVisibility() end
         end,
     })
 

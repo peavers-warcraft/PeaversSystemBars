@@ -44,8 +44,8 @@ PSB.Config = ConfigManager:NewWithAceDB(
             PSB.Core:UpdateTitleBarVisibility()
             PSB.Core:UpdateFrameLock()
 
-            if PSB.Core.UpdateVisibility then
-                PSB.Core:UpdateVisibility()
+            if PSB.Core.UpdateFrameVisibility then
+                PSB.Core:UpdateFrameVisibility()
             end
         end,
     }
