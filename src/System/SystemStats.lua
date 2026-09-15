@@ -55,6 +55,23 @@ local MIN_MAX_VALUES = {
 -- Equipment slots that can have durability
 local DURABILITY_SLOTS = { 1, 2, 3, 5, 6, 7, 8, 9, 10, 16, 17 }
 
+-- The ranged slot. Retail folded bows, guns and wands into the main hand in
+-- Mists of Pandaria, so neither retail nor Mists Classic has one, but Classic
+-- Era and Anniversary still do, and a hunter's bow wears down like anything
+-- else - leaving it out makes the percentage read higher than the repair bill.
+--
+-- Rather than guessing from the client version, ask the client: on Era and
+-- Anniversary GetInventorySlotInfo("RangedSlot") answers 18, and where the slot
+-- does not exist the call raises an error instead of returning nil, hence the
+-- pcall. It is resolved once here because the answer cannot change mid-session,
+-- and a failure simply leaves the list exactly as it was.
+do
+    local ok, rangedSlot = pcall(GetInventorySlotInfo, "RangedSlot")
+    if ok and type(rangedSlot) == "number" then
+        DURABILITY_SLOTS[#DURABILITY_SLOTS + 1] = rangedSlot
+    end
+end
+
 -- Get the current value for a stat type
 function SystemStats:GetValue(statType)
     if statType == "FPS" then

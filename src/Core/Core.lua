@@ -54,12 +54,37 @@ function Core:Initialize()
     -- Set up dragging
     self:UpdateFrameLock()
 
-    -- Show frame if configured
-    if config.showOnLogin then
+    -- Show or hide according to the visibility settings. This used to consult
+    -- showOnLogin alone, which left displayMode and hideOutOfCombat as settings
+    -- that could be changed but did nothing.
+    self:UpdateFrameVisibility()
+end
+
+-- Shows or hides the frame from displayMode, hideOutOfCombat and showOnLogin.
+--
+-- Edit Mode, the profile switch and PeaversCommons' combat and group-roster
+-- handlers (AddonInit:RegisterCommonEvents) all call this by name, but until now
+-- nothing defined it, and every one of those calls is guarded, so the settings
+-- silently did nothing. The rules themselves live in VisibilityManager, which is
+-- what every other bar addon in the collection hands this to; with the defaults
+-- (ALWAYS, not hidden out of combat, shown on login) it shows the frame, exactly
+-- as before.
+function Core:UpdateFrameVisibility()
+    if not self.frame then return false end
+
+    local VisibilityManager = PeaversCommons and PeaversCommons.VisibilityManager
+    if not VisibilityManager then
+        -- Without the shared rules, fall back to the one setting this file has
+        -- always honoured rather than leaving the frame in whatever state it is.
+        if PSB.Config.showOnLogin == false then
+            self.frame:Hide()
+            return false
+        end
         self.frame:Show()
-    else
-        self.frame:Hide()
+        return true
     end
+
+    return VisibilityManager:UpdateVisibility(self.frame, PSB.Config, self.inCombat)
 end
 
 function Core:AdjustFrameHeight()
